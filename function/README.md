@@ -184,4 +184,48 @@ fun numberDescription(n: Int, max: Int = 100): String = when (n) {
 }
 ```
 
+### for loop and iterable
 
+```
+    val a = IntArray(10) { it * it }
+    var sum = 0
+    for (x in a) {
+        sum += x
+    }
+    println("Sum: $sum")
+```
+1. 이터레이션에 담을 변수 정의(x)
+2. 이터레이션에 사용할 값들이 담겨 있는 컨테이너를 계산하기 위한 식(a)
+3. 루프 몸통에 해당하는 문 ({sum += 1}) 이터레이션 시 이 몸통이 실행됨
+* 이터레이션 변수는 루프 몸통 안쪽에서만 접근할 수 있다.
+
+### 루프 제어 흐름 변경하기 : break, continue
+
+- break는 즉시 루프를 종료
+- continue는 현재 루프 이터레이션을 마치고 조건 검사로 바로 진행하게 만듬
+
+
+### 예외 처리
+
+```
+fun parseIntNumbers(s: String): Int {
+    var num = 0
+    
+    if (s.length !in 1..31) throw NumberFormatException("Not a numbers: $s")
+    
+    for (c in s) {
+        if (c !in '0'..'1') throw NumberFormatException("Not a number: $s")
+        num = num * 2 + (c - '0')
+    }
+    
+    return num
+}
+```
+자바와 달리 new 구문을 사용하지 않고 NumberFormatException을 던질 수 있다.
+
+예외처리의 순서
+1. 예외를 잡아내는 핸들러를 찾는다. 일치하면 예외 핸들러가 처리
+2. 핸들러를 찾을 수 없다면 함수 실행 종료. 함수가 스택에서 pop. 이후 호출한 쪽의 문맥 안에서 예외 핸들러 검색 수행 (propagate)
+3. 프로그램 진입점에 이를때까지 예외를 잡지 못하면 스레드 종료
+
+try catch는 자바에서와 유사

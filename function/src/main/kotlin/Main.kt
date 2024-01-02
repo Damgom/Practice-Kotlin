@@ -38,7 +38,39 @@ fun main() {
 //    val num = readLine()!!.toInt()
 //    println(num in twoDigits)
 
+//    val a = IntArray(10) { it * it }
+//    var sum = 0
+//    for (x in a) {
+//        sum += x
+//    }
+//    println("Sum: $sum")
+    println(countLetters("abcd").contentToString())
+
 }
+
+fun countLetters(text: String): IntArray {
+    val counts = IntArray(26)
+    for (char in text) {
+        val charLower = char.lowercaseChar()
+        if (charLower !in 'a'..'z') continue
+        counts[charLower - 'a']++
+    }
+    return counts
+}
+
+/*
+문자열이 2진수 형태인지를 판별하는 함수
+ */
+fun parseIntNumbers(s: String, fallback: Int = -1): Int {
+    var num = 0
+    if (s.length !in 1..31) return fallback
+    for (c in s) {
+        if (c !in '0'..'1') return fallback
+        num = num * 2 + (c - '0')
+    }
+    return num
+}
+
 fun hexDigit2(n: Int): Char {
     if (n in 0..9) return '0' + n
     else if (n in 10..15) return 'A' + n - 10
