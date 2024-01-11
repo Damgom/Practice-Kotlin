@@ -160,3 +160,87 @@ class Person {
 - protected: 멤버를 멤버가 속한 클래스와 멤버가 속한 클래스의 모든 하위 클래스 안에서 볼 수 있다.
 - private: 멤버를 멤버가 속한 클래스 내부에서만 볼 수 있다.
 
+```kotlin
+class Person(private val firstName: String, private val familyName: String) {
+    fun fullName() = "$firstName $familyName"
+}
+
+fun main() {
+    val person = Person("John", "Doe")
+//    println(person.firstName) -> error
+    println(person.fullName())
+}
+```
+주생성자의 가시성을 지정하려면 constructor 키워드 명시
+```kotlin
+class Empty private constructor() {
+    fun showMe() = println("Empty")
+}
+
+fun main() {
+//    Empty().showMe() -> 이 경우 Empty 클래스의 유일한 생성자가 private이므로 클래스 본문 외부에서 인스턴스화 할 수 없다.
+}
+```
+
+### 내포된 클래스
+함수, 프로퍼티, 생성자 외에 코틀린 클래스는 다른 클래스도 멤버로 가질 수 있다. (내포된 클래스)
+
+```kotlin
+class Person(val id: Id, val age: Int) {
+    class Id(val firstName: String, val familyName: String)
+    fun showMe() = println("${id.firstName} ${id.familyName}, $age")
+}
+
+fun main() {
+    val id = Person.Id("John", "Doe")
+    val person = Person(id, 25)
+    person.showMe()
+}
+```
+내포된 클래스에서도 가시성을 지정가능
+```kotlin
+class Person(private val id: Id, private val age: Int) {
+    class Id(private val firstName: String, private val familyName: String) {
+        fun nameSake(person: Person) = person.id.firstName == firstName
+    }
+    // 바깥쪽 클래스는 자신에게 내포된 클래스의 비공개 멤버에 접근 불가
+    fun showMe() = println("${id.firstName} ${id.familyName}, $age")
+}
+```
+
+내포된 클래스에 inner를 붙여야 자신을 둘러싼 외부 클래스의 현재 인스턴스에 접근 가능
+
+- 자바에서의 inner 클래스와 비슷하다. 차이는 코틀린은 inner 변경자가 붙는다. 자바에서는 디폴트로 내부 클래스이지만 내부 클래스가 외부 클래스 인스턴스와 연관되지 않기는 원한다면 static을 붙여야한다.
+- 하지만 코틀린에서는 inner가 없으면 외부 클래스 인스턴스와 연관되지 않는다.
+
+### 지역 클래스
+
+함수 본문에서 클래스를 정의할 수 있다.
+```kotlin
+fun main() {
+    class Point(val x: Int, val y: Int) {
+        fun shift(dx: Int, dy: Int): Point = Point(x + dx, y + dy)
+        override fun toString() = "($x, $y)"
+    }
+    val p = Point(10, 10)
+    println(p.shift(-1, 3))
+}
+```
+
+```kotlin
+fun main() {
+    var x = 1
+    
+    class Counter {
+        fun increment() {
+            x++
+        }
+    }
+    
+    Counter().increment()
+    
+    println(x)
+}
+```
+
+### 널 가능성
