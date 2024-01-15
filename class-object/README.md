@@ -244,3 +244,86 @@ fun main() {
 ```
 
 ### 널 가능성
+- 코틀린의 타입 시스템에는 null 값이 될 수 있는 참조 타입과 null 값이 될 수 없는 참조 타입을 확실히 구분해준다. null 발생 여부를 컴파일 시점으로 옮겨주기 때문에 null safe 한 환경을 구성할 수 있다.
+
+#### 널이 될 수 있는 타입
+
+- 코틀린에서는 기본적으로 모든 참조타입은 null이 될 수 없다. 따라서 String 같은 타입에 null 값을 대입할 수 없다. 
+
+```kotlin
+fun isLetterString(s: String): Boolean {
+    if (s.isEmpty()) return false
+    for (ch in s) {
+        if (!ch.isLetter()) return false
+    }
+    return true
+}
+
+fun main() {
+    println(isLetterString(null)) // error 발생
+}
+```
+
+이런 함수는 코틀린 컴파일러에서 컴파일 시점에 방지해준다
+
+코틀린에서 널이 될 수 있는 값을 받는 함수를 작성하려면
+```kotlin
+fun isBooleanString(s: String?) = s == "false" || s == "true"
+```
+
+파라미터 타입 뒤에 ? 를 붙여서 타입이 널이 될 수 있는 타입으로 지정해야 한다.
+
+코틀린에서 String? 과 같이 널이 될 수 있는 타입을 nullable type이라 한다. ?가 붙은 타입은 원래 타입의 상위 타입이며, 원래 타입에 속하는 모든 값으로 이뤄진 집합을 null로 확장한 집합이다. (java에서의 wrapper class?)
+
+nullable type은 하위타입의 값을 대입할 수 있다. 하지만 반대는 안된다.
+```kotlin
+fun main() {
+    val s: String? = "abc"
+    val ss: String = s //error 발생
+}
+```
+
+nullable type은 원래 타입에 들어있는 어떤 프로퍼티나 메서드도 제공하지 않는다.
+```kotlin
+fun isLetterString(s: String?): Boolean {
+    if (s.isEmpty()) return false
+    for (ch in s) {
+        if (!ch.isLetter()) return false
+    }
+    return true
+}
+```
+String? 타입에 iterator() 메서드가 없기 때문에 for 루프를 사용해 이터레이션을 수행할 수는 없다.
+
+#### 널 가능성과 스마트 캐스트
+
+널이 될 수 있는 값을 처리하는 가장 직접적인 방법은 조건문을 사용해 null과 비교하는것
+```kotlin
+fun isLetterString(s: String?): Boolean {
+    if (s == null) return false
+    if (s.isEmpty()) return false
+    for (ch in s) {
+        if (!ch.isLetter()) return false
+    }
+    return true
+}
+```
+
+스마트 캐스트를 실행하려면 대상 변수의 값이 검사 지점과 사용 지점 사이에서 변하지 않는다고 컴파일러가 확신할 수 있어야 한다. 즉 널 검사와 사용 지점 사이에서 값이 변경되는 경우에는 스마트캐스트가 작동하지 않음
+
+#### 엘비스 연산자
+
+널이 될 수 있는 값을 다룰 때 엘비스 연산자를 사용할 수 있다. 이것은 널을 대신할 디폴트 값을 지정할 수 있다.
+```kotlin
+fun sayHello(name: String?) {
+    println("Hello, " + (name ?: "Unknown"))
+}
+
+fun main() {
+    sayHello("John") // Hello, John
+    sayHello(null) // Hello, Unknown
+}
+```
+
+return이나 throw를 엘비스 연산자 오른쪽에 끼워넣거 early return 가능
+
